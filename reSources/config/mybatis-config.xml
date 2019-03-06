@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+ PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<properties resource="config/jdbc.properties" />
+
+	<settings>
+ 		<setting name="logImpl" value="LOG4J"/>
+	</settings>
+
+	<typeAliases>
+		<!-- （方法一） typeAliases(别名): type代表路径   alias:表示别名 -->
+		<typeAlias type="qn131.entity.Produce" alias="Produce"/>
+		<!-- （方法二） 配置包名，自动搜索下面包下面的类(默认类名当做别名) -->
+		<!--   <package name="qn131.entity"/>     -->
+	</typeAliases>
+
+	<environments default="development">
+		<environment id="development">
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${mydriver}" />
+				<property name="url" value="${url}" />
+				<property name="username" value="${username}" />
+				<property name="password" value="${password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	
+	<mappers>
+		<mapper resource="qn131/dao/impl/ProduceMapper.xml" />
+	</mappers>
+</configuration>

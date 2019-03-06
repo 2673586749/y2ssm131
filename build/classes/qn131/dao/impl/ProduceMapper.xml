@@ -1,0 +1,103 @@
+<!DOCTYPE mapper
+ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <!-- namespace这个里面写的是Dao接口的路径 -->
+<mapper namespace="qn131.dao.ProduceDao">
+<!-- resultMap结果集     查询取值 -->
+<!-- property:类的属性      column:数据库列名  -->
+<!-- 只要column(数据库列名)正确，前面的property(类的属性)随便写 -->
+<!-- resultMap: type里面放的是实体类的地址(type="qn131.entity.Produce") 但是这里使用了别名代替typeAliases（别名） 例子:alias="Produce" -->
+<!-- resultMap: id是随便给      id名和select里面的resultMap绑定 -->
+	<resultMap type="Produce" id="abc">
+		<id property="produce_Code" column="produce_Code" />
+		<result property="Produce_info" column="Produce_info" />
+		<result property="Produce_info2" column="Produce_info2"/>
+		<result property="Produce_img" column="Produce_img"/>
+		<result property="Produce_sytle" column="Produce_sytle"/>
+		<result property="Produce_time" column="Produce_time"/>
+	</resultMap>
+	
+	<!-- 这个sql里面随便什么都可以放，用include调用   include里的refid和sql里的id对应 -->
+	<sql id="ffff">
+		produce_Code,Produce_info,Produce_info2,Produce_img,produce_sytle
+	</sql>
+	
+	<!-- ${tablename}连表查询:写个别名代替(占位符) -->
+	<sql id="aaaa">
+		${tablename}produce_Code
+		,${tablename}Produce_info
+		,${tablename}Produce_info2
+		,${tablename}Produce_img
+		,${tablename}produce_sytle
+	</sql>
+	
+	<update id="update">
+		update produce
+		<!-- 去空（去头去尾） prefix：前缀（怎么都会加上不管if什么条件）    prefixOverrides:去掉前面的东西（,）  suffixOverrides:删掉结尾的东西（,） -->
+		<trim prefix="SET" prefixOverrides="," suffixOverrides=",">	
+		<if test="Produce_info != null">
+			Produce_info = #{Produce_info}
+		</if>
+		<if test="Produce_img != null">
+			,Produce_img = #{Produce_img}
+		</if>
+		</trim>
+		<trim prefix="where" prefixOverrides="and|or">  <!-- and|or  去掉and或者or -->
+			<if test="produce_Code != null">
+				produce_Code = #{Produce_Code};
+			</if>
+		</trim>
+	</update>
+	
+	<!-- 添加一条数据 -->
+	<insert id="add">
+		INSERT INTO `produce`  
+		(produce_Code,Produce_info,Produce_info2,Produce_img,produce_sytle,produce_time)
+		VALUES (#{produce_Code},#{Produce_info},#{Produce_info2},#{Produce_img},#{produce_sytle},#{produce_time});
+	</insert>
+	
+	
+	<!-- 批量添加 -->
+	<insert id="addVast">
+	INSERT INTO `produce`
+	(produce_Code,Produce_info,Produce_info2,Produce_img,produce_sytle,produce_time)
+	<trim prefix="VALUES" prefixOverrides=",">
+		<!-- foreach（循环） -->
+		<foreach item="item" index="index" collection="list">
+			,(#{item.produce_Code},#{item.Produce_info},#{item.Produce_info2},#{item.Produce_img},#{item.produce_sytle},#{item.produce_time})
+		</foreach>
+	</trim>
+
+	</insert>
+	
+	<!-- 
+	这种形式的万一属性名不对，就会报错
+	<select id="select" resultType="qn131.entity.Produce">
+		select * from `produce`
+	</select>
+	 -->
+	
+	<!-- select里的id和Dao里面的方法名对应 -->
+	<select id="select" resultMap="abc">
+		select 
+		<include refid="aaaa">  <!-- 用include调用 sql -->
+		<!-- property用来调用上面的sql  name等于${tablename}(占位符)里面的别名(tablename)  value等于值(占位符的值)  ${tablename}=t. -->
+			<property name="tablename" value="t."/>
+		</include>
+		from produce t
+	</select>
+	
+	<select id="select2" resultMap="abc">
+		select 
+		<include refid="ffff"></include>
+		from produce
+	</select>
+	
+	<delete id="dell">
+		 delete from produce where produce_Code =
+		 <foreach item="item" index="index" collection="id">
+            #{item}
+        </foreach>
+	</delete>
+	
+</mapper>
